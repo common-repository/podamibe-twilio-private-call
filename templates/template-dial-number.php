@@ -1,0 +1,35 @@
+<?php
+/*
+*	@package Twilio Private Call
+*	@twilio voice url
+*	This template generate TWIML to dial the user phone number
+*/	
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+use Twilio\Twiml;
+header("content-type: text/xml"); 
+$response = new Twiml();
+/* caller's number */
+$caller_number = isset( $_REQUEST['From'] ) ? $_REQUEST['From']:"";/* called twilio number */
+$called_number = isset( $_REQUEST['To'] ) ? $_REQUEST['To']:"";
+/* called user information using called twilio number */
+$called_user = pod_twilio_get_user_by_twilio_number( $called_number );if($caller_number=="+14157234000"){	if( $called_user ){		$response->dial( $called_user->phone_number );		print $response;	}}else{	/* caller user information using called user number */	$caller_user = pod_twilio_get_user_by_phone_number( $caller_number );		if( ! $caller_user ){		$response->say( __( "Sorry! This number is not registered in our database.", POD_TWILIO_TEXT_DOMAIN ) );		print apply_filters( "pod_twilio_number_not_registered_response", $response, $called_user, $caller_user );	}
+	else if( ! $called_user ){
+		/* if no receiver user exists */
+		$response->say( __( "Sorry! You are not allowed to call this number.", POD_TWILIO_TEXT_DOMAIN ) );
+		print apply_filters( "pod_twilio_not_allowed_response_to_call", $response, $called_user, $caller_user );
+	}
+	else{
+		if( $caller_user->remaining_call_duration <= 60 ){
+			/* if call duration is less than minute */
+			$response->say( __( "Sorry ! You need to buy call duration.", POD_TWILIO_TEXT_DOMAIN ) );
+			print apply_filters( "pod_twilio_account_expired_response", $response, $called_user, $caller_user );
+		}
+		else{
+			/*
+			*	total time users can talk
+			*	equals to remaining call duration
+			*/						$contact_request = new POD_TWilio_Contact_Request_Handler( $called_user->_id, $caller_user->_id );			$contact_exists = $contact_request->contact_exists;						if( ! $contact_exists ){				$response->say( __( "Sorry ! This number is not in your contact.", POD_TWILIO_TEXT_DOMAIN ) );				print apply_filters( "pod_twilio_contact_not_exist_response", $response, $called_user, $caller_user );			}			else{				$contact_status = $contact_request->contact_status;								switch( $contact_status ){					case "Deleted":						if( $contact_request->contact->contact_removed == "RR" ){							if( $caller_user->_id == $contact_request->contact->request_receiver_id ){								$response->say( __( "You removed this number from your contact.", POD_TWILIO_TEXT_DOMAIN ) );								print apply_filters( "pod_twilio_caller_removed_callee_response_receiver_removed", $response, $called_user, $caller_user );							}							else{								$response->say( __( "Sorry ! This user has removed you from contacts.", POD_TWILIO_TEXT_DOMAIN ) );								print apply_filters( "pod_twilio_callee_removed_caller_response_receiver_removed", $response, $called_user, $caller_user );							}						}						else if( $contact_request->contact->contact_removed == "SR" ){							if( $caller_user->_id == $contact_request->contact->request_sender_id ){								$response->say( __( "You removed this number from your contact.", POD_TWILIO_TEXT_DOMAIN ) );								print apply_filters( "pod_twilio_caller_removed_callee_response_sender_removed", $response, $called_user, $caller_user );							}							else{								$response->say( __( "Sorry ! This user has removed you from contacts.", POD_TWILIO_TEXT_DOMAIN ) );								print apply_filters( "pod_twilio_callee_removed_caller_response_sender_removed", $response, $called_user, $caller_user );							}						}						else{							$response->say( __( "Error ! Invalid Contact Status.", POD_TWILIO_TEXT_DOMAIN ) );							print apply_filters( "pod_twilio_invalid_contact_status_response_on_delete", $response, $called_user, $caller_user );						}						break;					case "Verification Pending":						$verificaion_status = $contact_request->get_verification_status();											if( $verificaion_status == "User Verification Pending" ){							$response->say( __( "Error ! Please verify your Number.", POD_TWILIO_TEXT_DOMAIN ) );							print apply_filters( "pod_twilio_verify_caller_number_response", $response, $called_user, $caller_user );						}						else if( $verificaion_status == "Contact Verification Pending" ){							$response->say( __( "Error ! Called user number verification is pending.", POD_TWILIO_TEXT_DOMAIN ) );							print apply_filters("pod_twilio_verify_callee_number_response", $response, $called_user, $caller_user );						}						else{							$response->say( __( "Error ! Invalid Contact Status.", POD_TWILIO_TEXT_DOMAIN ) );							print apply_filters( "pod_twilio_invalid_contact_status_response_on_verification_pending", $response, $called_user, $caller_user );						}						break;					case "In Contact":						do_action( "pod_twilio_before_dial_user_phone_number", $response, $called_user, $caller_user );												$time_limit = apply_filters( "pod_twilio_call_time_limit", $caller_user->remaining_call_duration, $called_user, $caller_user );												/**						*	set time limit						**/						$response->dial(											$called_user->phone_number,											array(												"timeLimit"	=> $time_limit,												"action" 	=> get_page_link( get_option( "pod_twilio_dial_callback_page_id" ) ), 												"callerId" 	=> $caller_user->twilio_number											)										);												print apply_filters( "pod_twilio_initiate_dial_call", $response , $called_user, $caller_user );												do_action( "pod_twilio_after_call_complete", $response, $called_user, $caller_user );						break;					case "Rejected":						if( $caller_user->_id == $contact_request->contact->request_receiver_id ){							$response->say( __( "You rejected contact request from this number.", POD_TWILIO_TEXT_DOMAIN ) );							print apply_filters( "pod_twilio_caller_rejected_contact_request_response", $response, $called_user, $caller_user );						}						else{							$response->say( __( "Sorry ! This user rejected your contact request.", POD_TWILIO_TEXT_DOMAIN ) );							print apply_filters( "pod_twilio_callee_rejected_contact_request_response", $response, $called_user, $caller_user );						}						break;					case "Pending":						if( $caller_user->_id == $contact_request->contact->request_receiver_id ){							$response->say( __( "Contact Request is pending. Please accept contact request from this number.", POD_TWILIO_TEXT_DOMAIN ) );							print apply_filters( "pod_twilio_received_contact_request_pending_response", $response, $called_user, $caller_user );						}						else{							$response->say( __( "Sorry ! Contact request sent to this user is pending.", POD_TWILIO_TEXT_DOMAIN ) );							print apply_filters( "pod_twilio_sent_contact_request_pending_response", $response, $called_user, $caller_user );						}						break;					default:						$response->say( __( "Error ! Invalid Contact Status.", POD_TWILIO_TEXT_DOMAIN ) );						print apply_filters( "pod_twilio_invalid_contact_status_response", $response, $called_user, $caller_user );						break;				}						}
+		}
+	}}

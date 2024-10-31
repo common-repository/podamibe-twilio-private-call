@@ -1,0 +1,154 @@
+form ul{
+	list-style-type: none;
+}
+
+ul.pod-twilio-tabs {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+	width: 100%;
+	overflow: auto;
+	text-align: center;
+    background-color: #f1f1f1;
+}
+
+ul.pod-twilio-tabs li {
+	flex-grow: 1;
+    display: inline-block;
+}
+
+ul.pod-twilio-tabs li a {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+	cursor: pointer;
+}
+
+/* Change the link color on hover */
+ul.pod-twilio-tabs li a:hover {
+    background-color: #555;
+    color: white;
+}
+
+ul.pod-twilio-tabs .pod-twilio-active-tab {
+    background-color: #4CAF50;
+}
+
+.pod-twilio-tab-content{
+	padding: 5px;
+}
+
+#pod-twilio-contacts #verified-contacts ul{
+	width: 100%;
+    display: table;
+    table-layout: fixed;
+} 
+
+#pod-twilio-contacts #verified-contacts ul li {
+	 display: table-cell;
+}
+
+#pod-twilio-contacts #verified-contacts ul li.twilio-phone{
+	text-align: center;
+}
+
+#pod-twilio-contacts #verified-contacts ul li.remove-twilio-contact{
+	position: absolute;
+	top: 25%;
+	right: 10px;
+}
+
+#pod-twilio-contacts #pending-requests ul, #pod-twilio-contacts #verified-contacts ul, #pod-twilio-users ul {
+	position: relative;
+	list-style-type: none;
+	padding: 5px;
+	margin: 0px;
+	border-bottom: 1px solid black;
+}
+
+#pod-twilio-contacts #pending-requests ul:nth-child(odd), #pod-twilio-contacts #verified-contacts ul:nth-child(odd), #pod-twilio-users ul:nth-child(odd) {
+	background: #dae5f4;
+}
+
+#pod-twilio-contacts #pending-requests ul li.contact-request-action, #pod-twilio-contacts #verified-contacts ul li.remove-twilio-contact, #pod-twilio-users ul li.status {
+	position: absolute;
+	top: 25%;
+	right: 10px;
+}
+
+#pod-twilio-contacts #pending-requests .contact-request-action a , #pod-twilio-contacts #verified-contacts .remove-twilio-contact a, #pod-twilio-users ul li.status a{
+    color: white;
+    padding: 5px;
+    text-decoration: none;
+	background-color: #1a1a1a;
+  /*   display: block; */
+}
+
+#pod-twilio-contacts #pending-requests .contact-request-action a:hover, #pod-twilio-contacts #verified-contacts .remove-twilio-contact a:hover, #pod-twilio-users ul li.status a:hover {
+	background-color: #1b4409;
+	cursor: pointer;
+}
+
+#pod-twilio-user-details p.call-duration {
+	margin: 15px 0 15px 0;
+	background: #dae5f4;
+	padding: 5px;
+}
+
+#pod-twilio-user-details #user-details h5{
+	margin-bottom : 0px;
+}
+
+#pod-twilio-user-details #user-details hr{
+	margin: 15px 0 15px 0;
+}
+
+#pod-twilio-user-details #user-details .title span{
+	display: inline-block;
+}
+
+#pod-twilio-user-details #twilio-buy-call form ul , #pod-twilio-user-details #user-details ul, {
+	list-style-type: none;
+	padding: 5px 0px;
+	margin: 0px;
+}
+
+#pod-twilio-user-details #twilio-buy-call form ul li, #pod-twilio-user-details #user-details ul li {
+	display: inline-block;
+    width: 225px;
+}
+
+#pod-twilio-user-details #twilio-buy-call form input[type=text]{
+	width: auto;
+}
+
+#pod-twilio-contacts .show-more{
+	text-align: center;
+	padding: 15px;
+}
+
+.pod-twilio-pagination {
+	margin-top: 15px;
+}
+
+.pod-twilio-pagination a{
+	background: #dae5f4;
+	display: inline-block;
+	width: 50px;
+	text-align: center;
+	margin: 0px 5px 0px 0px;
+}
+
+.pod-twilio-pagination span.current {
+	background: #a3bde0;
+	display: inline-block;
+	width: 50px;
+	margin: 0px 5px 0px 0px;
+	text-align: center;
+}
